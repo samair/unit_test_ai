@@ -24,6 +24,9 @@ repositories {
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
 //    implementation(libs.exampleLibrary)
+    implementation("com.azure:azure-ai-openai:1.0.0-beta.9")
+    implementation ("org.slf4j:slf4j-api:2.0.13")
+
 }
 
 // Set the JVM language level used to build the project.

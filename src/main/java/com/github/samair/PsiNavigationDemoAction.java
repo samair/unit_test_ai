@@ -4,19 +4,25 @@ import com.intellij.openapi.actionSystem.ActionUpdateThread;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.ui.Messages;
 
-import com.intellij.psi.JavaRecursiveElementVisitor;
-import com.intellij.psi.PsiClass;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiLocalVariable;
-import com.intellij.psi.PsiMethod;
+import com.intellij.openapi.vfs.LocalFileSystem;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class PsiNavigationDemoAction extends AnAction {
+
+    private final LLMClient llmClient;
+
+    public PsiNavigationDemoAction() {
+        this.llmClient = new LLMClient();
+    }
 
     @Override
     public @NotNull ActionUpdateThread getActionUpdateThread() {
@@ -25,6 +31,7 @@ public class PsiNavigationDemoAction extends AnAction {
 
     @Override
     public void actionPerformed(AnActionEvent anActionEvent) {
+        var project = anActionEvent.getProject();
         Editor editor = anActionEvent.getData(CommonDataKeys.EDITOR);
         PsiFile psiFile = anActionEvent.getData(CommonDataKeys.PSI_FILE);
         if (editor == null || psiFile == null) {
@@ -43,6 +50,34 @@ public class PsiNavigationDemoAction extends AnAction {
                     .append("\n");
             if (containingMethod != null) {
                 System.out.println(containingMethod.getText());
+                var response = this.llmClient.generateUnitTestCase(containingMethod.getText());
+                VirtualFile virtualFile = FileEditorManager.getInstance(project).getOpenFiles()[0];
+                PsiFile fileOpen = PsiManager.getInstance(project).findFile(virtualFile);
+                PsiDirectory targetDirectory = fileOpen.getContainingDirectory();
+
+
+                WriteCommandAction.runWriteCommandAction(project, () -> {
+                    try {
+                        PsiJavaFile javaFile = (PsiJavaFile) psiFile;
+                        var className  = javaFile.getClasses()[0];
+                        String fileName =   className.getName()+"Test.java";
+                        PsiFile newFile = targetDirectory.createFile(fileName);
+
+                        if (newFile != null) {
+                            PsiElementFactory elementFactory = JavaPsiFacade.getInstance(project).getElementFactory();
+                            PsiJavaFile psiJavaFile = (PsiJavaFile) newFile;
+                            PsiClass psiClass = elementFactory.createClassFromText(response, psiJavaFile);
+                            psiClass.setName(className.getName()+"Test");
+                            psiJavaFile.add(psiClass);
+
+                            // Optionally reformat the code
+                            CodeStyleManager.getInstance(project).reformat(newFile);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+
                 PsiClass containingClass = containingMethod.getContainingClass();
                 infoBuilder
                         .append("Containing class: ")
