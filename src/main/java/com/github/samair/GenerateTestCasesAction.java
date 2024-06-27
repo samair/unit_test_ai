@@ -9,18 +9,17 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.ui.Messages;
 
-import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class PsiNavigationDemoAction extends AnAction {
+public class GenerateTestCasesAction extends AnAction {
 
     private final LLMClient llmClient;
 
-    public PsiNavigationDemoAction() {
+    public GenerateTestCasesAction() {
         this.llmClient = new LLMClient();
     }
 

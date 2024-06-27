@@ -27,9 +27,9 @@
     <vendor url="https://plugins.jetbrains.com">IntelliJ Platform SDK</vendor>
 
     <actions>
-        <action class="com.github.samair.PsiNavigationDemoAction" id="PsiNavigationDemo"
-                text="PSI Navigation Demo...">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        <action id="com.github.samair.GenerateTestCasesAction" class="com.github.samair.GenerateTestCasesAction"
+                text="Test Cases">
+            <add-to-group group-id="GenerateGroup" anchor="first"/>
         </action>
     </actions>
 
