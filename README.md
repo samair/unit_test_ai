@@ -1,4 +1,4 @@
-# unit_test_ai
+# Unit Test AI
 
 ![Build](https://github.com/samair/unit_test_ai/workflows/Build/badge.svg)
 [![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
