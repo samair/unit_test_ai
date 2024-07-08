@@ -32,5 +32,5 @@
             <add-to-group group-id="GenerateGroup" anchor="first"/>
         </action>
     </actions>
-
+    <depends>com.intellij.gradle</depends>
 </idea-plugin>
